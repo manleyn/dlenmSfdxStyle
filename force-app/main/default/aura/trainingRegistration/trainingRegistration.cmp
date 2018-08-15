@@ -1,0 +1,309 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="ControllerTrainings">
+    <aura:attribute access="public" name="scheduledCourseId" type="String"/>
+    <aura:attribute access="public" name="scheduledCourse" type="sObject"/>
+    <aura:attribute access="public" name="fieldInfo" type="object"/>
+    <aura:attribute access="private" name="newLeads" type="Lead[]" default="[{'sobjectType':'Lead','LeadSource':'Web','Lead_Type__c':'AIM4SCubed'}]"/>
+    <aura:attribute access="private" name="costInfo" type="object[]" default="[]"/>
+    <aura:attribute access="private" name="newCPI" type="sObject" default="{'sObjectType':'CoursePaymentInfo__c'}"/>
+    <aura:attribute access="public" name="currRegCount" type="Integer" default="0"/>
+    <aura:attribute access="public" name="payOption" type="String"/>
+    <aura:attribute access="public" name="section1Icon" type="String" default="utility:chevrondown"/>
+    <aura:attribute access="public" name="section2Icon" type="String" default="utility:chevronright"/>
+    <aura:attribute access="public" name="section3Icon" type="String" default="utility:chevronright"/>
+    <aura:attribute access="public" name="cpiName" type="String" default=""/>
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:registerEvent name="serverCall" type="c:serverCall"/>
+    <aura:handler name="serverCall" event="c:serverCall" action="{!c.handleServerCall}"/>
+
+	<div class="slds-is-relative">
+        <lightning:spinner aura:id="mySpinner" size="medium" class="slds-hide" alternativeText="Loading form or sending data to database." />
+        <div class="slds-grid slds-gutters slds-wrap" aura:id="courseHeaderInfo">
+            <div class="slds-col slds-size_10-of-12">
+                <div class="slds-text-heading_large">Course Registration</div>
+                <div class="slds-text-heading_medium">{!v.scheduledCourse.CourseId__r.CourseName__c}</div>
+                <div class="slds-text-heading_small">{!v.scheduledCourse.WebCourseName__c}</div>
+                <div class="slds-m-top_xx-small slds-m-left_small">
+                    <lightning:formattedRichText value="{!v.scheduledCourse.WebCourseDescription__c}" />
+                </div>
+            </div>
+            <div class="slds-col slds-size_2-of-12">
+                <div class="slds-text-heading_large">Your Cost:</div>
+                <div class="slds-text-heading_medium">
+                    <div class="slds-clearfix">
+                        <aura:iteration items="{!v.costInfo}" var="item">
+                            <div class="slds-float_left">
+                                <p>{!item.firstName + ' ' + item.lastName}</p>
+                            </div>
+                            <div class="slds-float_right">
+                                <p><ui:outputCurrency value="{!item.cost}" format="$#,##0"/></p>
+                            </div>
+                        </aura:iteration>
+                        <div class="slds-float_left">
+                            <p>Total Cost:</p>
+                        </div>
+                        <div class="slds-float_right">
+                            <p><ui:outputCurrency value="{!v.costInfo.length * v.scheduledCourse.Cost__c}" format="$#,##0"/></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <ul class="slds-accordion" aura:id="regForm" >
+           <li class="slds-accordion__list-item">
+              <section class="slds-accordion__section slds-is-open" aura:id="section1">
+                 <div class="slds-accordion__summary">
+                    <h3 class="slds-text-heading--small slds-accordion__summary-heading">
+                       <lightning:icon iconName="{!v.section1Icon}" size="xx-small" class="slds-button__icon--left"/>Personal &amp; Organization Information
+                    </h3>
+                 </div>
+                 <div class="slds-accordion__content">
+                 <div class="slds-grid slds-gutters slds-wrap">
+	<aura:iteration items="{!v.newLeads}" var="lead" indexVar="idx">
+                    <aura:if isTrue="{!idx > 0}">
+                        <div class="slds-col slds-size_12-of-12 slds-m-top_medium">
+                        </div>
+                    </aura:if>
+					<div class="slds-col slds-size_2-of-12">
+                        <lightning:icon iconName="utility:user" size="large" alternativeText="Attendee"/><br/>
+                        <aura:if isTrue="{!idx > 0}">
+                            <lightning:button variant="base" label="Remove" onclick="{!c.removeLead}" value="{!idx}" iconName="utility:delete" iconPosition="left" />
+                        </aura:if>
+            		</div>
+                    <div class="slds-col slds-size_5-of-12">
+                        <div class="slds-text-heading_small">Personal Information</div>
+                        <div class="slds-form slds-form_stacked slds-box">
+                            <lightning:input aura:id="reqSection1Field" label="First Name" name="firstName" placeholder="First Name" required="true" value="{!lead.FirstName}"/>
+                            <lightning:input aura:id="reqSection1Field" label="Last Name" name="lastName" placeholder="Last Name" required="true" value="{!lead.LastName}"/>
+                            <lightning:input aura:id="reqSection1Field" label="Work/School Email" name="email" type="email" placeholder="Work/School Email" required="true" value="{!lead.Email}"/>
+                            <lightning:input aura:id="reqSection1Field" label="Telephone" name="tel" type="tel" pattern="^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$" placeholder="555-555-5555" required="true" value="{!lead.Phone}" onblur="{!c.formatPhone}"/>
+                        </div>
+                    </div>
+                    <div class="slds-col slds-size_5-of-12">
+                        <div class="slds-text-heading_small">Organization Information</div>
+                        <div class="slds-form slds-form_stacked slds-box">
+                            <lightning:input aura:id="reqSection1Field" label="School/Department/Organization" name="school" placeholder="Name of School/Department/Organization" required="true"  value="{!lead.Company}"/>
+                            <lightning:input aura:id="reqSection1Field" label="District" name="district" placeholder="District" required="true" value="{!lead.District__c}"/>
+                            <lightning:select aura:id="reqSection1Field" label="Program You Teach In" name="programType" messageWhenValueMissing="Please select one" value="{!lead.ProgramType__c}" required="true">
+                                <option value="">Choose one...</option>
+                                <aura:iteration items="{!v.fieldInfo.ProgramType__c}" var="pickVal">
+                                	<option value="{!pickVal}">{!pickVal}</option>
+                                </aura:iteration>
+                            </lightning:select>
+                            <lightning:select aura:id="reqSection1Field" label="Role" name="role" messageWhenValueMissing="Please select one" value="{!lead.Role__c}" required="true">
+                                <option value="">Choose one...</option>
+                                <aura:iteration items="{!v.fieldInfo.Role__c}" var="pickVal">
+                                	<option value="{!pickVal}">{!pickVal}</option>
+                                </aura:iteration>
+                            </lightning:select>
+                            <lightning:select aura:id="reqSection1Field" label="Grade" name="grade" messageWhenValueMissing="Please select one" value="{!lead.Grade__c}" required="true">
+                                <option value="">Choose one...</option>
+                                <aura:iteration items="{!v.fieldInfo.Grade__c}" var="pickVal">
+                                	<option value="{!pickVal}">{!pickVal}</option>
+                                </aura:iteration>
+                            </lightning:select>
+                        </div>
+                    </div>
+	</aura:iteration>
+                     <div class="slds-col slds-size_12-of-12 slds-text-align_center slds-m-top_medium">
+                        <lightning:button variant="neutral" label="Add Attendee" onclick="{!c.addNewLead}" />
+                        <lightning:button variant="brand" label="Next" onclick="{!c.accordianNav}" value="section1_next" />
+                    </div>
+                 </div>
+                </div>
+            </section>
+          </li>
+          <li class="slds-accordion__list-item">
+              <section class="slds-accordion__section" aura:id="section2">
+                 <div class="slds-accordion__summary">
+                    <h3 class="slds-text-heading--small slds-accordion__summary-heading">
+                    	<lightning:icon iconName="{!v.section2Icon}" size="xx-small" class="slds-button__icon--left"/>Billing Information
+                    </h3>
+                 </div>
+                 <div class="slds-accordion__content">
+                     <div class="slds-grid slds-gutters slds-wrap">
+                        <div class="slds-col slds-size_2-of-12">
+                            <lightning:icon iconName="utility:work_order_type" size="large" alternativeText="Billing Information"/>
+                        </div>
+                        <div class="slds-col slds-size_5-of-12">
+                            <div class="slds-text-heading_small">Billing Contact</div>
+                            <div class="slds-form slds-form_stacked slds-box">
+                                <lightning:input aura:id="reqSection2Field" label="Billing Contact First Name" name="billingFirstName" placeholder="First Name" required="true" value="{!v.newCPI.BillingFirstName__c}"/>
+                                <lightning:input aura:id="reqSection2Field" label="Billing Contact Last Name" name="billingLastName" placeholder="Last Name" required="true" value="{!v.newCPI.BillingLastName__c}"/>
+                                <lightning:input aura:id="reqSection2Field" label="Billing Contact Email" name="firstName" type="email" placeholder="Email" required="true" value="{!v.newCPI.BillingEmail__c}"/>
+                                <div class="slds-text-body_small slds-m-left_small">Invoices will be sent to this email.</div>
+                                <lightning:input aura:id="reqSection2Field" label="Phone" name="billingPhone" placeholder="555-555-5555" required="true" value="{!v.newCPI.BillingPhone__c}" type="tel" pattern="^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$" onblur="{!c.formatPhone}" />
+                                <lightning:input aura:id="reqSection2Field" label="Fax" name="billingFax" placeholder="555-555-5555" value="{!v.newCPI.BillingFax__c}" type="tel" pattern="^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$" onblur="{!c.formatPhone}"/>
+                            </div>
+                        </div>
+                        <div class="slds-col slds-size_5-of-12">
+                            <div class="slds-text-heading_small">Billing Address</div>
+                            <div class="slds-form slds-form_stacked slds-box">
+                                <lightning:textarea aura:id="reqSection2Field" name="billingStreet" placeholder="123 Any St" label="Billing Adress" required="true" value="{!v.newCPI.BillingStreet__c}"/>
+                                <lightning:input aura:id="reqSection2Field" label="City" name="billingCity" placeholder="City" required="true" value="{!v.newCPI.BillingCity__c}"/>
+                                <lightning:select aura:id="reqSection2Field" label="State" name="billingState" messageWhenValueMissing="Please select one" value="{!v.newCPI.BillingState__c}" required="true">
+                                    <option value="">Choose one...</option>
+                                    <option value="Alabama" >Alabama</option>
+                                    <option value="Alaska" >Alaska</option>
+                                    <option value="Arizona" >Arizona</option>
+                                    <option value="Arkansas" >Arkansas</option>
+                                    <option value="California" >California</option>
+                                    <option value="Colorado" >Colorado</option>
+                                    <option value="Connecticut" >Connecticut</option>
+                                    <option value="Delaware" >Delaware</option>
+                                    <option value="Florida" >Florida</option>
+                                    <option value="Georgia" >Georgia</option>
+                                    <option value="Hawaii" >Hawaii</option>
+                                    <option value="Idaho" >Idaho</option>
+                                    <option value="Illinois" >Illinois</option>
+                                    <option value="Indiana" >Indiana</option>
+                                    <option value="Iowa" >Iowa</option>
+                                    <option value="Kansas" >Kansas</option>
+                                    <option value="Kentucky" >Kentucky</option>
+                                    <option value="Louisiana" >Louisiana</option>
+                                    <option value="Maine" >Maine</option>
+                                    <option value="Maryland" >Maryland</option>
+                                    <option value="Massachusetts" >Massachusetts</option>
+                                    <option value="Michigan" >Michigan</option>
+                                    <option value="Minnesota" >Minnesota</option>
+                                    <option value="Mississippi" >Mississippi</option>
+                                    <option value="Missouri" >Missouri</option>
+                                    <option value="Montana" >Montana</option>
+                                    <option value="Nebraska" >Nebraska</option>
+                                    <option value="Nevada" >Nevada</option>
+                                    <option value="New Hampshire" >New Hampshire</option>
+                                    <option value="New Jersey" >New Jersey</option>
+                                    <option value="New Mexico" >New Mexico</option>
+                                    <option value="New York" >New York</option>
+                                    <option value="North Carolina" >North Carolina</option>
+                                    <option value="North Dakota" >North Dakota</option>
+                                    <option value="Ohio" >Ohio</option>
+                                    <option value="Oklahoma" >Oklahoma</option>
+                                    <option value="Oregon" >Oregon</option>
+                                    <option value="Pennsylvania" >Pennsylvania</option>
+                                    <option value="Rhode Island" >Rhode Island</option>
+                                    <option value="South Carolina" >South Carolina</option>
+                                    <option value="South Dakota" >South Dakota</option>
+                                    <option value="Tennessee" >Tennessee</option>
+                                    <option value="Texas" >Texas</option>
+                                    <option value="Utah" >Utah</option>
+                                    <option value="Vermont" >Vermont</option>
+                                    <option value="Virginia" >Virginia</option>
+                                    <option value="Washington" >Washington</option>
+                                    <option value="Washington, D.C." >Washington, D.C.</option>
+                                    <option value="West Virginia" >West Virginia</option>
+                                    <option value="Wisconsin" >Wisconsin</option>
+                                    <option value="Wyoming" >Wyoming</option>
+                                </lightning:select>
+                                <lightning:input aura:id="reqSection2Field" label="Zip Code" name="billingPostalCode" placeholder="12345" pattern="[0-9]{5}" required="true" value="{!v.newCPI.BillingPostalCode__c}"/>
+                            </div>
+                        </div>
+                        <div class="slds-col slds-size_2-of-12 slds-m-top_medium">
+
+                        </div>
+                        <div class="slds-col slds-size_10-of-12 slds-m-top_medium">
+							<div class="slds-text-heading_small">Department Head/Principal/Adminstrator Contact</div>
+                            <div class="slds-form slds-form_stacked slds-box">
+                                <lightning:input aura:id="reqSection2Field" label="Department Head/Principal/Adminstrator Name" name="adminName" placeholder="First Last" value="{!v.newCPI.AdministratorName__c}" required="true"/>
+                            	<lightning:input aura:id="reqSection2Field" label="Department Head/Principal/Adminstrator Email" name="adminEmail" type="email" placeholder="email@email.com" value="{!v.newCPI.AdministratorEmail__c}" required="true"/>
+                            </div>
+                        </div>
+                    <div class="slds-col slds-size_12-of-12 slds-text-align_center slds-m-top_medium">
+                        <lightning:button label="Previous" onclick="{! c.accordianNav }" value="section2_prev" /><lightning:button variant="brand" label="Next" onclick="{! c.accordianNav }" value="section2_next" />
+                    </div>
+                  </div>
+                 </div>
+            </section>
+          </li>
+          <li class="slds-accordion__list-item">
+              <section class="slds-accordion__section" aura:id="section3">
+                 <div class="slds-accordion__summary">
+                    <h3 class="slds-text-heading--small slds-accordion__summary-heading">
+                    	<lightning:icon iconName="{!v.section3Icon}" size="xx-small" class="slds-button__icon--left"/>Finalize Registration &amp; Payment Information
+                    </h3>
+                 </div>
+                 <div class="slds-accordion__content">
+                    <div class="slds-grid slds-gutters slds-wrap">
+                    <div class="slds-col slds-size_2-of-12">
+                        <lightning:icon iconName="utility:moneybag " size="large" alternativeText="Payment Information"/>
+                    </div>
+                    <div class="slds-col slds-size_10-of-12">
+                        <div class="slds-text-heading_small">Payment Information</div>
+                        <div class="slds-form slds-form_stacked slds-box">
+                            <lightning:select aura:id="paymentMethod" label="Payment Method" name="paymentMethod" messageWhenValueMissing="Please select a Payment Method" value="{!v.newCPI.PaymentMethod__c}" required="true" onchange="{! c.paymentOptionChange }">
+                                <option value="">Choose one...</option>
+                                <option value="Credit Card">Credit Card</option>
+                                <option value="Check">Check</option>
+                                <option value="Purchase Order">Purchase Order</option>
+                            </lightning:select>
+
+                            <div aura:id="checkPOOptions" class="slds-hide slds-m-top_small">
+                                <lightning:input aura:id="checkPO" label="{! (v.newCPI.PaymentMethod__c == 'Check' ? 'Check' : 'Purchase Order') + ' Number'}" name="checkNumber" placeholder="######" required="true" value="{!v.newCPI.CheckPONumber__c}"/>
+                                <lightning:input aura:id="checkPO" label="{! (v.newCPI.PaymentMethod__c == 'Check' ? 'Check' : 'Purchase Order') + ' Amount'}" name="checkAmount" placeholder="111.11" required="true" type="number" formatter="currency" step="0.01" value="{!v.newCPI.CheckPOAmount__c}"/>
+                            </div>
+
+                            <div aura:id="ccOptions" class="slds-hide slds-m-top_small">
+                                <div>You will receive an invoice with a link to provide a credit card once we process your registraion.</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slds-col slds-size_12-of-12">
+                        <div class="slds-form slds-form_stacked slds-m-top_small">
+                            <div class="slds-form-element">
+                                <label class="slds-form-element__label" for="understand">I understand...</label>
+                                <div class="slds-form-element__control">
+                                    <lightning:input aura:id="reqSection3Field" type="checkbox" label="{!v.scheduledCourse.RegistreeAcknowledgement__c}" name="understand" required="true"/>
+                                </div>
+                             </div>
+                        </div>
+                    </div>
+                    <div class="slds-col slds-size_12-of-12 slds-text-align_center slds-m-top_medium">
+                        <lightning:button label="Previous" onclick="{! c.accordianNav }" value="section3_prev" /><lightning:button variant="brand" label="Submit" onclick="{! c.submit }" />
+                    </div>
+                    </div>
+                 </div>
+            </section>
+          </li>
+        </ul>
+    </div>
+    <div aura:id="regSuccess" class="slds-is-relative slds-hide">
+        <div class="slds-notify_container slds-is-relative">
+            <div class="slds-notify slds-notify_toast slds-theme_success" role="alert">
+                <lightning:icon iconName="utility:success" size="small" class="slds-button__icon--left" variant="inverse" alternativeText="Successfully registered."/>
+                <div class="slds-notify__content">
+                	<h2 class="slds-text-heading_small ">Thank you for registering for {!v.scheduledCourse.CourseId__r.CourseName__c}!</h2>
+                </div>
+            </div>
+        </div>
+        <div class="slds-text-align_center slds-text-heading_small">
+            If you have questions please contact us and reference you Registration Number:<br/>
+            <span style="font-weight: bold;">{!v.cpiName}</span>
+        </div>
+    </div>
+    <div aura:id="regBlocked" class="slds-is-relative slds-hide">
+        <div class="slds-notify_container slds-is-relative">
+            <div class="slds-notify slds-notify_toast slds-theme_error" role="alert">
+                <lightning:icon iconName="utility:error" size="small" class="slds-button__icon--left" variant="inverse" alternativeText="Registration full."/>
+                <div class="slds-notify__content">
+                	<h2 class="slds-text-heading_small">Registration is full for this {!v.scheduledCourse.CourseId__r.CourseName__c}!</h2>
+                </div>
+            </div>
+        </div>
+        <div class="slds-text-align_center slds-text-heading_small">
+            If you have questions please <a href="http://dlenm.org/staff.aspx">contact us</a>.
+        </div>
+    </div>
+    <div aura:id="regFormError" class="slds-is-relative slds-hide">
+        <div class="slds-notify_container slds-is-relative">
+            <div class="slds-notify slds-notify_toast slds-theme_error" role="alert">
+                <lightning:icon iconName="utility:error" size="small" class="slds-button__icon--left" variant="inverse" alternativeText="Error has occurred."/>
+                <div class="slds-notify__content">
+                	<h2 class="slds-text-heading_small">An error has occurred. Sorry for the inconvenience.</h2>
+                </div>
+            </div>
+        </div>
+        <div class="slds-text-align_center slds-text-heading_small">
+            If you have questions please <a href="http://dlenm.org/staff.aspx">contact us</a>.
+        </div>
+    </div>
+</aura:component>

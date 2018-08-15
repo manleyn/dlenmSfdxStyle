@@ -1,0 +1,4 @@
+<aura:event type="COMPONENT" description="Event template">
+	<aura:attribute name="success" type="Boolean"/>
+    <aura:attribute name="message" type="String"/>
+</aura:event>

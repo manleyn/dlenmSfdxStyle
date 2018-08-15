@@ -1,0 +1,77 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="ControllerTrainings">
+    <aura:attribute access="public" name="selectedCourseType" type="String"/>
+    <aura:attribute access="public" name="scheduledCourses" type="sObject[]"/>
+    <aura:attribute access="public" name="selectedCourseId" type="String"/>
+    <aura:attribute access="public" name="selectedCourse" type="sObject"/>
+    <aura:attribute access="public" name="selectedCourseDayId" type="String"/>
+    <aura:attribute access="public" name="rosterList" type="object[]"/>
+    <aura:attribute access="public" name="rosterColumns" type="List"/>
+    <aura:attribute access="public" name="rowForNotes" type="object"/>
+    <aura:registerEvent name="serverCall" type="c:serverCall"/>
+    <aura:handler name="serverCall" event="c:serverCall" action="{!c.handleServerCall}"/>
+
+	<div class="slds-is-relative" aura:id="loggerForm">
+        <lightning:spinner aura:id="mySpinner" size="medium" class="slds-hide" alternativeText="Loading form or sending data to database." />
+        <div>
+            <div class="slds-clearfix">
+                <div class="slds-float_left slds-p-right_medium">
+                    <span class="slds-text-heading_small">Course Type</span>
+                    <lightning:select aura:id="courseTypes" name="courseTypeSelect" value="{!v.selectedCourseType}" onchange="{!c.getCourses}">
+                        <option value="">Choose one...</option>
+                        <option value="AIM">AIM</option>
+                        <option value="GLAD">GLAD</option>
+                    </lightning:select>
+                </div>
+                <div class="slds-float_left slds-p-right_medium">
+                    <span class="slds-text-heading_small">Scheduled Courses</span>
+                    <lightning:select aura:id="selectedCourse" name="courseSelect" value="{!v.selectedCourseId}" disabled="true" onchange="{!c.showDaysForCourse}">
+                        <option value="">Choose one...</option>
+                        <aura:iteration items="{!v.scheduledCourses}" var="course">
+                            <option value="{!course.Id}">{!course.Name}</option>
+                        </aura:iteration>
+                    </lightning:select>
+                </div>
+                <div class="slds-float_left slds-p-right_medium">
+                    <span class="slds-text-heading_small">Course Day</span>
+                    <lightning:select aura:id="selectedDay" name="courseDaySelect" value="{!v.selectedCourseDayId}" onchange="{!c.getRoster}" disabled="true">
+                        <option value="">Choose one...</option>
+                        <aura:iteration items="{!v.selectedCourse.ScheduledCourseDays__r}" var="day">
+                            <option value="{!day.Id}">{!day.ScheduledDate__c}</option>
+                        </aura:iteration>
+                    </lightning:select>
+                </div>
+            </div>
+        </div>
+        <div aura:id="rosterDiv" class="slds-m-top_large">
+            <div class="slds-text-heading_small">Roster:</div>
+            <div>
+                <lightning:datatable data="{! v.rosterList }"
+                columns="{! v.rosterColumns }"
+                keyField="Id"
+                hideCheckboxColumn="true"
+                onrowaction="{! c.handleRowAction }"/>
+            </div>
+        </div>
+    </div>
+    <div aura:id="notesModel" class="slds-hide" style="height: 640px;">
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close" variant="bare-inverse" onclick="{!c.hideNotes}" alternativeText="Close window." class="slds-modal__close" size="large" />
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{!v.rowForNotes.Name}</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <lightning:textarea name="notesTextArea" value="{!v.rowForNotes.Notes}" label="Add/Update Notes:" maxlength="255" />
+                </div>
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_neutral" onclick="{!c.hideNotes}">Cancel</button>
+                    <button class="slds-button slds-button_brand" onclick="{!c.saveNotes}">Save</button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </div>
+    <div class="slds-is-relative" aura:id="errorInfo">
+
+    </div>
+</aura:component>

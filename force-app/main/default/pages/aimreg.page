@@ -1,0 +1,53 @@
+<apex:page controller="ControllerCourseListAIM" showHeader="false" standardStylesheets="false" sidebar="false" applyHtmlTag="false" applyBodyTag="false" docType="html-5.0">
+
+<html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="x-ua-compatible" content="ie=edge" />
+  <title>{!trainings[0].CourseId__r.CourseName__c}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Import the Design System style sheet -->
+  <apex:slds />
+</head>
+<body>
+
+  <!-- REQUIRED SLDS WRAPPER -->
+  <div class="slds-scope">
+
+    <!-- MASTHEAD -->
+	<div class="slds-text-heading_large">{!trainings[0].CourseId__r.CourseName__c}</div>
+    <!-- / MASTHEAD -->
+
+    <apex:repeat var="trn" value="{!trainings}">
+    	<div class="slds-border_top slds-m-top_large">
+            <div class="slds-text-heading_medium">{!trn.WebCourseName__c}</div>
+            <div class="slds-m-top_xx-small slds-m-left_medium" style="font-size: 115%;"><apex:outputText value="{!trn.WebCourseDescription__c}" escape="false" /></div>
+            <div class="slds-m-top_xx-small slds-m-bottom_medium" style="font-size: 115%;">
+            	<strong>Location:</strong> {!trn.Location__c} <a href="{!'https://www.google.com/maps/place/' + URLENCODE(trn.Location__c)}" target="_new">
+                    <svg class="slds-button__icon slds-button__icon_right" aria-hidden="true">
+                        <use xlink:href="{!URLFOR($Asset.SLDS, 'assets/icons/utility-sprite/svg/symbols.svg#location')}" />
+                    </svg>
+                </a>
+            </div>
+            <apex:outputPanel rendered="{!registeredAttendees[trn.Id] < trn.MaxNoRegistrations__c}" style="font-size: 115%;">
+                <a href="{!'https://dlenmorg.force.com/s/trainingregistration?courseid=' + trn.Id}" target="_top">
+                    Register Now
+                    <svg class="slds-button__icon slds-button__icon_right" aria-hidden="true">
+                        <use xlink:href="{!URLFOR($Asset.SLDS, 'assets/icons/utility-sprite/svg/symbols.svg#forward')}" />
+                    </svg>
+                </a>
+            </apex:outputPanel>
+            <apex:outputPanel rendered="{!registeredAttendees[trn.Id] >= trn.MaxNoRegistrations__c}" style="font-size: 115%;">
+                Registration Full
+                <svg class="slds-button__icon slds-button__icon_right" aria-hidden="true">
+                    <use xlink:href="{!URLFOR($Asset.SLDS, 'assets/icons/utility-sprite/svg/symbols.svg#error')}" />
+                </svg>
+            </apex:outputPanel>
+        </div>
+	</apex:repeat>
+  </div>
+  <!-- / REQUIRED SLDS WRAPPER -->
+
+</body>
+</html>
+</apex:page>

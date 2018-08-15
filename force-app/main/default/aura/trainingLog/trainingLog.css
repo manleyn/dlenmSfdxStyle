@@ -1,0 +1,9 @@
+.THIS .attended {
+    font-weight: bold;
+    color: green;
+}
+
+.THIS .abscent {
+    font-weight: bold;
+    color: red;
+}

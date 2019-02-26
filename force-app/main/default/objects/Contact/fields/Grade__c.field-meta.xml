@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Grade__c</fullName>
+    <externalId>false</externalId>
+    <label>Grade</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>K - 5</fullName>
+                <default>false</default>
+                <label>K - 5</label>
+            </value>
+            <value>
+                <fullName>K - 12</fullName>
+                <default>false</default>
+                <label>K - 12</label>
+            </value>
+            <value>
+                <fullName>1st</fullName>
+                <default>false</default>
+                <label>1st</label>
+            </value>
+            <value>
+                <fullName>2nd</fullName>
+                <default>false</default>
+                <label>2nd</label>
+            </value>
+            <value>
+                <fullName>3rd</fullName>
+                <default>false</default>
+                <label>3rd</label>
+            </value>
+            <value>
+                <fullName>4th</fullName>
+                <default>false</default>
+                <label>4th</label>
+            </value>
+            <value>
+                <fullName>5th</fullName>
+                <default>false</default>
+                <label>5th</label>
+            </value>
+            <value>
+                <fullName>6th - 8th</fullName>
+                <default>false</default>
+                <label>6th - 8th</label>
+            </value>
+            <value>
+                <fullName>9th - 12th</fullName>
+                <default>false</default>
+                <label>9th - 12th</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

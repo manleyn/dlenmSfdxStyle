@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomApplication xmlns="http://soap.sforce.com/2006/04/metadata">
+    <defaultLandingTab>Course__c</defaultLandingTab>
+    <formFactors>Large</formFactors>
+    <isNavAutoTempTabsDisabled>false</isNavAutoTempTabsDisabled>
+    <isNavPersonalizationDisabled>false</isNavPersonalizationDisabled>
+    <label>Training Course Management</label>
+    <tabs>standard-Lead</tabs>
+    <tabs>Course__c</tabs>
+    <tabs>standard-Contact</tabs>
+    <tabs>ScheduledCourse__c</tabs>
+    <tabs>ScheduledCourseDay__c</tabs>
+    <tabs>CoursePaymentInfo__c</tabs>
+    <tabs>CourseEnrollment__c</tabs>
+    <tabs>standard-report</tabs>
+</CustomApplication>

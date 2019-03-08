@@ -1,6 +1,6 @@
 <!--contentType="text/csv"-->
-<apex:page controller="ControllerRegistrantList" standardStylesheets="false" showHeader="false" sidebar="false">
+<apex:page controller="ControllerRegistrantList" standardStylesheets="false" showHeader="false" sidebar="false" contentType="text/csv">
   <apex:repeat value="{!registrants}" var="reg">
-    "{!reg.ContactId__r.FirstName}","{!reg.ContactId__r.LastName}","{!reg.ContactId__r.Email}","{!reg.ContactId__r.Phone}","{!reg.ContactId__r.ProgramType__c}","{!reg.ContactId__r.Role__c}","{!reg.ContactId__r.Role__c}","{!reg.ContactId__r.Account.Name}","{!reg.ContactId__r.Account.BillingStreet}","{!reg.ContactId__r.Account.BillingState}","{!reg.ContactId__r.Account.BillingCity}","{!reg.ContactId__r.Account.BillingPostalCode}","{!reg.CoursePaymentInfoId__r.AdministratorName__c}"  
+    {!reg}
   </apex:repeat>
 </apex:page>

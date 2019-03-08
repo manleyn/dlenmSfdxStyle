@@ -1,0 +1,14 @@
+{
+    "records": [
+        {
+            "attributes": {
+                "type": "Contact",
+                "referenceId": "ContactRef1"
+            },
+            "FirstName": "Test First",
+            "LastName": "Test Last",
+            "Email": "test@email.com",
+            "AccountId": "@AccountRef1"
+        }
+    ]
+}

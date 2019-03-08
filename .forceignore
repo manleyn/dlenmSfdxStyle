@@ -116,3 +116,12 @@ force-app/main/default/siteDotComSites/
 force-app/main/default/sites/
 force-app/main/default/staticresources/
 force-app/main/default/settings/
+force-app/main/default/layouts/Account-Account %28Support%29 Layout.layout-meta.xml
+force-app/main/default/layouts/Account-Account Layout.layout-meta.xml
+force-app/main/default/layouts/Account-Account %28Marketing%29 Layout.layout-meta.xml
+force-app/main/default/layouts/Account-Account %28Sales%29 Layout.layout-meta.xml
+force-app/main/default/layouts/Lead-Lead %28Support%29 Layout.layout-meta.xml
+force-app/main/default/layouts/Lead-Lead Layout.layout-meta.xml
+force-app/main/default/layouts/Contact-Contact Layout.layout-meta.xml
+force-app/main/default/layouts/Lead-Lead %28Marketing%29 Layout.layout-meta.xml
+force-app/main/default/layouts/Lead-Lead %28Sales%29 Layout.layout-meta.xml

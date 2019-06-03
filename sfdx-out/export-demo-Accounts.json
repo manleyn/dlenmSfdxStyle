@@ -1,0 +1,16 @@
+{
+    "records": [
+        {
+            "attributes": {
+                "type": "Account",
+                "referenceId": "AccountRef1"
+            },
+            "Name": "Test Account 1",
+            "BillingStreet": "Test Billing Address",
+            "BillingCity": "Test City",
+            "BillingState": "Test State",
+            "BillingPostalCode": "Test Zip",
+            "BillingCountry": "US"
+        }
+    ]
+}

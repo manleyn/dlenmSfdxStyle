@@ -4,6 +4,14 @@
     <objectMapping>
         <inputObject>Lead</inputObject>
         <mappingFields>
+            <inputField>District__c</inputField>
+            <outputField>RegistrationDistrict__c</outputField>
+        </mappingFields>
+        <outputObject>Account</outputObject>
+    </objectMapping>
+    <objectMapping>
+        <inputObject>Lead</inputObject>
+        <mappingFields>
             <inputField>Grade__c</inputField>
             <outputField>Grade__c</outputField>
         </mappingFields>

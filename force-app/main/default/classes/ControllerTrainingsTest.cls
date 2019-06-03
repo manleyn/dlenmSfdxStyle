@@ -2,6 +2,7 @@
 public class ControllerTrainingsTest {
     static Map<String,String> mockData;
     static CourseEnrollment__c mockCE;
+    static Id mockSchedCourse;
 
     @isTest
     public static void getFieldInfo(){
@@ -79,12 +80,29 @@ public class ControllerTrainingsTest {
         Database.LeadConvertResult lcr = Database.convertLead(lc);
         System.assert(lcr.isSuccess());
     }
+    
+    @isTest 
+    static void testRegistrantListCSV() {
+        
+        testLeadConversionTrigger();
+        
+        Test.StartTest(); 
+        
+            ApexPages.currentPage().getParameters().put('id', String.valueOf(mockSchedCourse));
+            ControllerRegistrantList  testRL = new ControllerRegistrantList();
+            List<String> regList = testRL.registrants;
+        	System.assertNotEquals(0, regList.size());
+        
+        Test.StopTest();
+    }
+    
 
     public static Map<String,String> insertMockData(){
         Course__c c = (Course__c)JSON.deserializeStrict('{"Name":"AIM Level 1","CourseName__c":"CourseName","CourseType__c":"AIM"}', Course__c.class);
         insert c;
         ScheduledCourse__c sc = (ScheduledCourse__c)JSON.deserializeStrict('{"CourseId__c" : "' + c.Id + '", "WebCourseDescription__c" : "description", "Location__c" : "location", "WebCourseName__c" : "courseName", "Cost__c" : 1000.00, "RegistreeAcknowledgement__c" : "acknowledgement", "PublishedToWeb__c" : true}', ScheduledCourse__c.class);
         insert sc;
+        mockSchedCourse = sc.Id;
         ScheduledCourseDay__c scd = (ScheduledCourseDay__c)JSON.deserializeStrict('{"ScheduledCourseId__c" : "' + sc.Id + '", "Name" : "Day1", "ScheduledDate__c" : "2018-01-10" }', ScheduledCourseDay__c.class);
         insert scd;
 
